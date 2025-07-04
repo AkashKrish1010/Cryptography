@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// Fixed matrix as per the question
+char matrix[5][5] = {
+    {'M', 'F', 'H', 'I', 'K'},
+    {'U', 'N', 'O', 'P', 'Q'},
+    {'Z', 'V', 'W', 'X', 'Y'},
+    {'E', 'L', 'A', 'R', 'G'},
+    {'D', 'S', 'T', 'B', 'C'}
+};
+
+// Function to find character position in matrix
+void findPosition(char ch, int *row, int *col) {
+    if (ch == 'J') ch = 'I'; // Merge I and J
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            if (matrix[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+}
+
+// Encrypt pair using Playfair rules
+void encryptPair(char a, char b, char *res) {
+    int r1, c1, r2, c2;
+    findPosition(a, &r1, &c1);
+    findPosition(b, &r2, &c2);
+
+    if (r1 == r2) { // Same row
+        res[0] = matrix[r1][(c1 + 1) % 5];
+        res[1] = matrix[r2][(c2 + 1) % 5];
+    } else if (c1 == c2) { // Same column
+        res[0] = matrix[(r1 + 1) % 5][c1];
+        res[1] = matrix[(r2 + 1) % 5][c2];
+    } else { // Rectangle
+        res[0] = matrix[r1][c2];
+        res[1] = matrix[r2][c1];
+    }
+}
+
+// Prepare text: remove punctuation, make uppercase, insert filler X if needed
+void prepareText(char *msg, char *cleaned) {
+    int len = 0;
+    for (int i = 0; msg[i]; i++) {
+        if (isalpha(msg[i])) {
+            cleaned[len++] = toupper(msg[i]);
+        }
+    }
+    cleaned[len] = '\0';
+
+    // Insert filler 'X' for repeated letters in pair and odd length
+    char temp[200];
+    int j = 0;
+    for (int i = 0; i < len; i += 2) {
+        temp[j++] = cleaned[i];
+        if (i + 1 < len) {
+            if (cleaned[i] == cleaned[i + 1])
+                temp[j++] = 'X';
+            temp[j++] = cleaned[i + 1];
+        }
+    }
+    if (j % 2 != 0) temp[j++] = 'X';
+    temp[j] = '\0';
+
+    strcpy(cleaned, temp);
+}
+
+int main() {
+    char message[] = "Must see you over Cadogan West. Coming at once.";
+    char prepared[200], ciphertext[200];
+    char encryptedPair[2];
+    int k = 0;
+
+    prepareText(message, prepared);
+
+    for (int i = 0; i < strlen(prepared); i += 2) {
+        encryptPair(prepared[i], prepared[i + 1], encryptedPair);
+        ciphertext[k++] = encryptedPair[0];
+        ciphertext[k++] = encryptedPair[1];
+    }
+    ciphertext[k] = '\0';
+
+    printf("Original Message:\n%s\n", message);
+    printf("Prepared Text:\n%s\n", prepared);
+    printf("Encrypted Text:\n%s\n", ciphertext);
+
+    return 0;
+}

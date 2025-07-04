@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <math.h>
+
+// Function to compute log2(n!)
+double log2_factorial(int n) {
+    double result = 0.0;
+    for (int i = 2; i <= n; i++)
+        result += log2(i);
+    return result;
+}
+
+int main() {
+    int total_letters = 25; // 5x5 matrix excluding J (I/J combined)
+
+    // 1. Total possible keys = 25!
+    double log2_total_keys = log2_factorial(total_letters);
+    printf("Total possible Playfair keys (approx): 2^%.0f\n", log2_total_keys);
+
+    // 2. Estimate effective unique keys (dividing by 4 for symmetrical equivalences)
+    double log2_effective_keys = log2_total_keys - log2(4);
+    printf("Effectively unique Playfair keys (approx): 2^%.0f\n", log2_effective_keys);
+
+    return 0;
+}
