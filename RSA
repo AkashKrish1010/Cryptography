@@ -1,0 +1,41 @@
+# Simple RSA Implementation (for educational purposes)
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+def modinv(a, m):
+    # Extended Euclidean Algorithm
+    m0, x0, x1 = m, 0, 1
+    while a > 1:
+        q = a // m
+        a, m = m, a % m
+        x0, x1 = x1 - q * x0, x0
+    return x1 % m0
+
+def encrypt_rsa(msg, e, n):
+    cipher = [(ord(char) ** e) % n for char in msg]
+    return cipher
+
+def decrypt_rsa(cipher, d, n):
+    plain = ''.join([chr((char ** d) % n) for char in cipher])
+    return plain
+
+# RSA Key Generation (use small primes for demo)
+p = 3
+q = 11
+n = p * q        # 33
+phi = (p-1)*(q-1)  # 20
+e = 3            # Public exponent (coprime with phi)
+d = modinv(e, phi)  # Private exponent
+
+print("Public Key: (", e, ",", n, ")")
+print("Private Key: (", d, ",", n, ")")
+
+# Encrypt and Decrypt
+message = "HI"
+cipher_text = encrypt_rsa(message, e, n)
+print("Encrypted:", cipher_text)
+
+decrypted = decrypt_rsa(cipher_text, d, n)
+print("Decrypted:", decrypted)
