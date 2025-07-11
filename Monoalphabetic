@@ -1,0 +1,25 @@
+def generate_mono_key():
+    import random
+    alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    shuffled = alphabet[:]
+    random.shuffle(shuffled)
+    return dict(zip(alphabet, shuffled)), dict(zip(shuffled, alphabet))
+
+def mono_encrypt(plaintext, key_map):
+    plaintext = plaintext.upper().replace(" ", "")
+    return ''.join(key_map.get(c, c) for c in plaintext)
+
+def mono_decrypt(ciphertext, reverse_key_map):
+    return ''.join(reverse_key_map.get(c, c) for c in ciphertext)
+
+# Generate random monoalphabetic key
+key_map, reverse_map = generate_mono_key()
+print("Encryption Key:", key_map)
+
+# Example usage
+text = input("Enter plaintext: ")
+cipher = mono_encrypt(text, key_map)
+print("Encrypted:", cipher)
+
+plain = mono_decrypt(cipher, reverse_map)
+print("Decrypted:", plain)
